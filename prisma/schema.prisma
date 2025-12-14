@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../prisma/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Template {
+  id                String              @id @default(uuid())
+  name              String
+  description       String
+  width             Int
+  height            Int
+  backgroundColor   String
+  backgroundImage   String?
+  positions         ImagePosition[]
+  brandingText      String?
+  brandingColor     String?
+  isCustom          Boolean             @default(false)
+  userId            String
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ImagePosition {
+  id            String   @id @default(uuid())
+  x             Int
+  y             Int
+  width         Int
+  height        Int
+  isOverlay     Boolean? @default(false)
+  src           String?
+  name          String?
+  templateId    String
+  template      Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String?
+  password  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  templates Template[]
+
+  @@index([email])
+  @@index([name])
+}
